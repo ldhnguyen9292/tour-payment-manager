@@ -7,11 +7,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
+  @ApiOperation({ summary: 'Login' })
+  @ApiBody({ schema: { example: { username: 'test', password: '123abc' } } })
+  @ApiResponse({ status: 200, description: 'Logged in successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async login(@Request() req, @Response() res) {
     if (req.user) {
       req.login(req.user, (err) => {
@@ -25,6 +31,9 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiOperation({ summary: 'Logout' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  @ApiResponse({ status: 500 })
   async logout(@Request() req, @Response() res) {
     req.logout((err) => {
       if (err) {
