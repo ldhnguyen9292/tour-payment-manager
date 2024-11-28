@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../users/user.schema';
@@ -12,16 +12,19 @@ export class AuthService {
     const user = await this.usersService.findOne(username, {
       password: 1,
       username: 1,
+      email: 1,
       isAdmin: 1,
     });
 
-    // Compare the password with the hashed password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-
-    if (user && isValidPassword) {
-      const { password, ...result } = user.toObject();
-      return result;
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
-    return null;
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    return user;
   }
 }

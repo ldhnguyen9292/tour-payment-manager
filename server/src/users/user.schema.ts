@@ -1,18 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-import { addSoftDelete } from 'plugins/mongoose';
+import { addSoftDelete } from 'src/plugins/mongoose';
 
 @Schema({ collection: 'users', timestamps: true })
 export class User extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   username: string;
 
-  @Prop({ required: true, select: false })
-  password: string;
+  @Prop({ required: false }) // Optional for OAuth users
+  password?: string;
 
-  @Prop({ required: true, default: false })
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop({ default: false })
   isAdmin: boolean;
+
+  @Prop()
+  provider?: string;
+
+  @Prop()
+  providerId?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
