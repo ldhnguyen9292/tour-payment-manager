@@ -1,23 +1,65 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
-import MemberDetails from "./components/MemberDetails";
-import Navigation from "./components/Navigation";
+import axios from 'axios';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes
+} from 'react-router-dom';
 
-export default function App() {
-  const isAuthenticated = localStorage.getItem("token") ? true : false;
+import { Toaster } from './components/ui/toaster';
+import { Dashboard, Login, Register } from './pages';
+import { RootState } from './store';
+import { setAuth } from './store/auth/authSlice';
+
+axios.defaults.withCredentials = true;
+
+function App() {
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/status`
+        );
+        dispatch(setAuth({ isAuthenticated: true, user: response.data }));
+      } catch {
+        // If the user is not authenticated, do nothing
+      }
+    };
+
+    checkAuthStatus();
+  }, [dispatch]);
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
-        {isAuthenticated && <Navigation />}
+      <div className="App">
         <Routes>
-          <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
-          <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
-          <Route path="/member/:id" element={isAuthenticated ? <MemberDetails /> : <Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
+          />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/"
+            element={
+              <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
+            }
+          />
         </Routes>
+        <Toaster />
       </div>
     </Router>
   );
 }
+
+export default App;

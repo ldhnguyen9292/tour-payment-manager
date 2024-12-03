@@ -15,7 +15,17 @@ import { TeamMembersModule } from 'src/team-members/team-members.module';
 import { User } from 'src/users/user.schema';
 import { UsersModule } from 'src/users/users.module';
 
+function generatePassword(
+  length = 20,
+  characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$',
+) {
+  return Array.from(crypto.getRandomValues(new Uint32Array(length)))
+    .map((x) => characters[x % characters.length])
+    .join('');
+}
+
 describe('AppController', () => {
+  const password = generatePassword();
   let app: INestApplication;
   let userModel: Model<User>;
   let mongoServer: MongoMemoryServer;
@@ -77,7 +87,7 @@ describe('AppController', () => {
     await userModel.deleteMany({});
     await userModel.create({
       username: 'admin',
-      password: await bcrypt.hash('Abc1234@', 10),
+      password: await bcrypt.hash(password, 10),
       email: 'admin@admin.com',
       isAdmin: true,
     });
@@ -87,7 +97,7 @@ describe('AppController', () => {
     it('should log in and then log out successfully with session', async () => {
       const loginResponse = await agent
         .post('/auth/login')
-        .send({ username: 'admin', password: 'Abc1234@' })
+        .send({ username: 'admin', password })
         .expect(200);
       expect(loginResponse.body.message).toBe('Logged in successfully');
 
@@ -131,7 +141,7 @@ describe('AppController', () => {
         .send({
           username: 'newuser',
           email: 'newuser@yopmail.com',
-          password: 'Abc1234@',
+          password: generatePassword(),
         })
         .expect(201);
     });
@@ -153,7 +163,7 @@ describe('AppController', () => {
         .send({
           username: 'newuser2',
           email: 'invalidemail',
-          password: 'Abc1234@',
+          password: generatePassword(),
         })
         .expect(400);
     });
@@ -164,7 +174,7 @@ describe('AppController', () => {
         .send({
           username: 'admin',
           email: 'admin@admin.com',
-          password: 'Abc1234@',
+          password: generatePassword(),
         })
         .expect(400);
     });
@@ -172,7 +182,8 @@ describe('AppController', () => {
     it('should return all users', async () => {
       await agent
         .post('/auth/login')
-        .send({ username: 'admin', password: 'Abc1234@' });
+        .send({ username: 'admin', password })
+        .expect(200);
 
       await agent.get('/users').expect(200);
     });

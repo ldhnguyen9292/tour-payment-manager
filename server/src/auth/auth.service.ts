@@ -9,12 +9,16 @@ export class AuthService {
   constructor(private usersService: UsersService) {}
 
   async validateUser(username: string, password: string): Promise<User> {
-    const user = await this.usersService.findOne(username, {
-      password: 1,
-      username: 1,
-      email: 1,
-      isAdmin: 1,
-    });
+    // search username or email
+    const user = await this.usersService.findOne(
+      { $or: [{ username }, { email: username }] },
+      {
+        password: 1,
+        username: 1,
+        email: 1,
+        isAdmin: 1,
+      },
+    );
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -25,6 +29,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
+    // Should remove password from the user object before returning
+    delete user.password;
     return user;
   }
 }

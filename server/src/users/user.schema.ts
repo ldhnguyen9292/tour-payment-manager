@@ -5,8 +5,11 @@ import { addSoftDelete } from 'src/plugins/mongoose';
 
 @Schema({ collection: 'users', timestamps: true })
 export class User extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   username: string;
+
+  @Prop()
+  name?: string;
 
   @Prop({ required: false }) // Optional for OAuth users
   password?: string;
@@ -22,6 +25,9 @@ export class User extends Document {
 
   @Prop()
   providerId?: string;
+
+  @Prop()
+  avatarUrl?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

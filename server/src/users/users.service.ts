@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
+import { ProjectionType, RootFilterQuery } from 'mongoose';
 
-import { ProjectionType } from 'mongoose';
 import { SoftDeleteModel } from 'src/plugins/mongoose';
 import { User } from './user.schema';
 
@@ -15,10 +15,10 @@ export class UsersService {
   }
 
   async findOne(
-    username: string,
+    conditions: RootFilterQuery<User>,
     projection?: ProjectionType<User> | null,
   ): Promise<User | undefined> {
-    return this.userModel.findOne({ username }, projection).exec();
+    return this.userModel.findOne(conditions, projection).exec();
   }
 
   async findByEmail(

@@ -32,6 +32,11 @@ async function bootstrap() {
       credentials: true,
     });
   } else {
+    app.enableCors({
+      origin: ['http://localhost:3000', 'http://localhost:3001'],
+      credentials: true,
+    });
+
     // Swagger configuration
     const config = new DocumentBuilder()
       .setTitle('Tour Payment Manager API')
