@@ -1,16 +1,26 @@
 import { Document, Model, Schema } from 'mongoose';
 
 export function addSoftDelete(schema: Schema) {
-  // Add the `isDeleted` field to the schema
-  schema.add({ isDeleted: { type: Boolean, default: false } });
+  schema.add({
+    deletedAt: { type: Date, default: null },
+    isDeleted: { type: Boolean, default: false },
+  });
 
-  // Add the `softDelete` static method
-  schema.statics.softDelete = async function (id: string) {
-    return this.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  schema.methods.softDelete = function () {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
+    return this.save();
+  };
+
+  schema.methods.restore = function () {
+    this.isDeleted = false;
+    this.deletedAt = null;
+    return this.save();
   };
 }
 
 // Define a SoftDeleteModel interface
 export interface SoftDeleteModel<T extends Document> extends Model<T> {
   softDelete(id: string): Promise<T | null>;
+  restore(id: string): Promise<T | null>;
 }

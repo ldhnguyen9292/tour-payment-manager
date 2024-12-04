@@ -52,3 +52,53 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
+/**
+ * Features:
+ * - The app is now using the `cookie-parser`, `express-session`, and `passport` middleware.
+ * - The app is now using the `cors` middleware with different configurations based on the environment.
+ * - The app is now using the Swagger module to generate API documentation.
+ * - API documentation is now available at `/api-docs`.
+ *
+ * List APIs:
+ *  - Auth APIs: Done
+ *    + POST /auth/login
+ *    + POST /auth/logout
+ *    + GET /auth/me
+ *    + GET /google
+ *    + GET /google/callback
+ *    + GET /facebook
+ *    + GET /facebook/callback
+ *  - User APIs:
+ *    + GET /users/:id
+ *    + POST /users
+ *    + PUT /users/:id
+ *    + GET /users/reset-password/:email
+ *    + PATCH /users/reset-password
+ *    + GET /users/team-members
+ *    + GET /users/team-members/:id
+ *    + POST /users/team-members
+ *    + PUT /users/team-members/:id
+ *    + DELETE /users/team-members/:id
+ *  - Admin APIs: Done
+ *    + GET /admin/users
+ *    + GET /admin/users/:id
+ *    + POST /admin/users
+ *    + PUT /admin/users/:id
+ *    + DELETE /admin/users/:id
+ *    + PUT /admin/restore/users/:id
+ *  - Tour APIs:
+ *    + GET /tours
+ *    + GET /tours/:id
+ *    + POST /tours
+ *    + PUT /tours/:id
+ *    + DELETE /tours/:id
+ *  - Payment APIs:
+ *    + GET /payments
+ *    + GET /payments/:id
+ *    + POST /payments
+ *    + PUT /payments/:id
+ *    + DELETE /payments/:id
+ *  - Dashboard APIs:
+ *    + GET /dashboard
+ */

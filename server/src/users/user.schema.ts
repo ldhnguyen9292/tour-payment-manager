@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 import { addSoftDelete } from 'src/plugins/mongoose';
 
@@ -11,11 +11,11 @@ export class User extends Document {
   @Prop()
   name?: string;
 
-  @Prop({ required: false }) // Optional for OAuth users
+  @Prop({ select: false }) // Optional for OAuth users
   password?: string;
 
-  @Prop({ required: true, unique: true })
-  email: string;
+  @Prop({ unique: true })
+  email?: string;
 
   @Prop({ default: false })
   isAdmin: boolean;
@@ -28,6 +28,12 @@ export class User extends Document {
 
   @Prop()
   avatarUrl?: string;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  teamMembers?: User[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

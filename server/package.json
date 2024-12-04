@@ -13,7 +13,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --config ./test/jest-e2e.json"
+    "test": "jest --config ./test/jest-e2e.json",
+    "create:folder": "node scripts/create-folder.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.12",

@@ -2,9 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
-import { TeamMembersModule } from './team-members/team-members.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ToursModule } from './tours/tours.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -19,9 +22,12 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
     UsersModule,
-    TeamMembersModule,
+    AuthModule,
+    AdminModule,
+    PaymentsModule,
+    ToursModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

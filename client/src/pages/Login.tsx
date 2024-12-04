@@ -44,7 +44,7 @@ const Login: React.FC = () => {
   const checkStatus = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/auth/status`
+        `${import.meta.env.VITE_BACKEND_URL}/auth/me`
       );
       // If the user is logged in, set the user profile in the Redux store
       if (response.status === 200) {

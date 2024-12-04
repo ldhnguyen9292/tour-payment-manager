@@ -25,7 +25,7 @@ function App() {
     const checkAuthStatus = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/auth/status`
+          `${import.meta.env.VITE_BACKEND_URL}/auth/me`
         );
         dispatch(setAuth({ isAuthenticated: true, user: response.data }));
       } catch {

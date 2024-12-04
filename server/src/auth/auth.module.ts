@@ -21,6 +21,5 @@ import { LocalStrategy } from './strategy/local.strategy';
     ConfigService,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
 })
 export class AuthModule {}

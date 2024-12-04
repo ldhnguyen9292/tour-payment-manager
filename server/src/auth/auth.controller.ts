@@ -58,7 +58,7 @@ export class AuthController {
     }
   }
 
-  @Get('status')
+  @Get('me')
   @ApiOperation({ summary: 'Check authentication status' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Authenticated' })
   @ApiResponse({
