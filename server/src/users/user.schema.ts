@@ -1,23 +1,50 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
 import { addSoftDelete } from 'src/plugins/mongoose';
 
 @Schema({ collection: 'users', timestamps: true })
+@ApiSchema({
+  name: 'User',
+})
 export class User extends Document {
   @Prop({ required: true, unique: true })
+  @ApiProperty({
+    type: 'string',
+    description: 'The username of the user',
+    example: 'newuser',
+  })
   username: string;
 
   @Prop()
+  @ApiProperty({
+    type: 'string',
+    description: 'The name of the user',
+    example: 'New User',
+    required: false,
+  })
   name?: string;
 
   @Prop({ select: false }) // Optional for OAuth users
   password?: string;
 
   @Prop({ unique: true })
+  @ApiProperty({
+    type: 'string',
+    description: 'The email of the user',
+    example: 'newuser@yopmail.com',
+    required: false,
+  })
   email?: string;
 
   @Prop({ default: false })
+  @ApiProperty({
+    type: 'boolean',
+    description: 'The admin status of the user',
+    example: false,
+    required: false,
+  })
   isAdmin: boolean;
 
   @Prop()
@@ -27,6 +54,12 @@ export class User extends Document {
   providerId?: string;
 
   @Prop()
+  @ApiProperty({
+    type: 'string',
+    description: 'The avatar URL of the user',
+    example: 'https://example.com/avatar.jpg',
+    required: false,
+  })
   avatarUrl?: string;
 
   @Prop({
@@ -34,6 +67,9 @@ export class User extends Document {
     default: [],
   })
   teamMembers?: User[];
+
+  @Prop()
+  resetPasswordToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

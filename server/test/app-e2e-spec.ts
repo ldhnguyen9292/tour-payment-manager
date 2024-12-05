@@ -11,18 +11,9 @@ import * as passport from 'passport';
 import * as request from 'supertest';
 
 import { AuthModule } from 'src/auth/auth.module';
-import { TeamMembersModule } from 'src/team-members/team-members.module';
+import { generatePassword } from 'src/lib/randomPass';
 import { User } from 'src/users/user.schema';
 import { UsersModule } from 'src/users/users.module';
-
-function generatePassword(
-  length = 20,
-  characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$',
-) {
-  return Array.from(crypto.getRandomValues(new Uint32Array(length)))
-    .map((x) => characters[x % characters.length])
-    .join('');
-}
 
 describe('AppController', () => {
   const password = generatePassword();
@@ -49,7 +40,6 @@ describe('AppController', () => {
         }),
         AuthModule,
         UsersModule,
-        TeamMembersModule,
       ],
     }).compile();
 

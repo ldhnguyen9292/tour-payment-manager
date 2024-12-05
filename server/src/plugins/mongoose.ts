@@ -1,4 +1,4 @@
-import { Document, Model, Schema } from 'mongoose';
+import { Document, Model, Schema, Types } from 'mongoose';
 
 export function addSoftDelete(schema: Schema) {
   schema.add({
@@ -24,3 +24,5 @@ export interface SoftDeleteModel<T extends Document> extends Model<T> {
   softDelete(id: string): Promise<T | null>;
   restore(id: string): Promise<T | null>;
 }
+
+export const objectId = (id: string) => new Types.ObjectId(id);

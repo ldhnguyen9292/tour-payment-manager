@@ -69,8 +69,7 @@ bootstrap();
  *    + GET /google/callback
  *    + GET /facebook
  *    + GET /facebook/callback
- *  - User APIs:
- *    + GET /users/:id
+ *  - User APIs: Done
  *    + POST /users
  *    + PUT /users/:id
  *    + GET /users/reset-password/:email

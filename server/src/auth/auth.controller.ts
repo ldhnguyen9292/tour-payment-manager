@@ -11,6 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/users/user.schema';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -59,8 +60,12 @@ export class AuthController {
   }
 
   @Get('me')
-  @ApiOperation({ summary: 'Check authentication status' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Authenticated' })
+  @ApiOperation({ summary: 'Check authentication status and get user info' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Authenticated',
+    type: User,
+  })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Not authenticated',

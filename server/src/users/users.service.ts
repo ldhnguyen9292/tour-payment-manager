@@ -1,14 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { ProjectionType, RootFilterQuery } from 'mongoose';
 
-import { SoftDeleteModel } from 'src/plugins/mongoose';
+import { objectId, SoftDeleteModel } from 'src/plugins/mongoose';
 import { User } from './user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('User') private userModel: SoftDeleteModel<User>) {}
+  constructor(
+    @InjectModel('User') private userModel: SoftDeleteModel<User>,
+    private configService: ConfigService,
+  ) {}
 
   async find(conditions: RootFilterQuery<User>): Promise<User[]> {
     return this.userModel.find(conditions).exec();
@@ -22,7 +26,7 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<User | undefined> {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(objectId(id)).exec();
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
@@ -72,17 +76,37 @@ export class UsersService {
   }
 
   async updateById(id: string, user: Partial<User>): Promise<User | null> {
+    if (user.email) {
+      const existedEmail = await this.userModel.findOne({ email: user.email });
+
+      if (existedEmail) {
+        throw new BadRequestException('Email already exists');
+      }
+    }
+
+    if (user.username) {
+      const existedUsername = await this.userModel.findOne({
+        username: user.username,
+      });
+
+      if (existedUsername) {
+        throw new BadRequestException('Username already exists');
+      }
+    }
+
     if (user.password) {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       user.password = hashedPassword;
     }
 
-    return this.userModel.findByIdAndUpdate(id, user, { new: true }).exec();
+    return this.userModel
+      .findByIdAndUpdate(objectId(id), user, { new: true })
+      .exec();
   }
 
   async softDelete(id: string): Promise<User | null> {
     // Cannot delete admin user
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel.findById(objectId(id)).exec();
     if (user.isAdmin) {
       throw new BadRequestException('Cannot delete admin user');
     }
@@ -92,5 +116,39 @@ export class UsersService {
 
   async restore(id: string): Promise<User | null> {
     return this.userModel.restore(id);
+  }
+
+  async sendEmailToResetPassword(email: string): Promise<void> {
+    const existedUser = await this.userModel.findOne({ email }).exec();
+
+    if (!existedUser) {
+      throw new BadRequestException('User not found!');
+    }
+
+    const token = Math.random().toString(36).substring(2, 15);
+    existedUser.resetPasswordToken = token;
+    await existedUser.save();
+
+    // Send email to reset password
+    const resetPasswordLink = `${this.configService.get<string>('FRONTEND_URL') || 'localhost:3000'}/reset-password?token=${token}`;
+    console.log('Reset password link:', resetPasswordLink);
+  }
+
+  async resetPassword(data: {
+    token: string;
+    password: string;
+  }): Promise<User | null> {
+    const existedUser = await this.userModel
+      .findOne({ resetPasswordToken: data.token })
+      .exec();
+
+    if (!existedUser) {
+      throw new BadRequestException('User not found!');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    existedUser.password = hashedPassword;
+    existedUser.resetPasswordToken = undefined;
+    return existedUser.save();
   }
 }

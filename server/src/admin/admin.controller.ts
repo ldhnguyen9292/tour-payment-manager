@@ -19,6 +19,7 @@ import {
 
 import { AuthenticatedGuard } from 'src/auth/auth.guard';
 import { RequireAdmin } from 'src/auth/require-admin.decorator';
+import { generatePassword } from 'src/lib/randomPass';
 import { User } from 'src/users/user.schema';
 import { AdminService } from './admin.service';
 
@@ -67,7 +68,7 @@ export class AdminController {
     description: 'Only available to admin users',
   })
   @ApiBody({
-    schema: { default: { username: 'abc', password: 'Asdasdas!dafd123' } },
+    schema: { default: { username: 'abc', password: generatePassword() } },
   })
   @ApiResponse({ status: 201, type: User })
   async create(@Body() user: User) {
@@ -80,6 +81,16 @@ export class AdminController {
     description: 'Only available to admin users',
   })
   @ApiParam({ name: 'id' })
+  @ApiBody({
+    schema: {
+      example: {
+        username: 'newuser',
+        email: 'newuser@yopmail.com',
+        name: 'New User',
+        password: generatePassword(),
+      },
+    },
+  })
   @ApiResponse({ status: 200, type: User })
   async update(@Param('id') id: string, @Body() user: User) {
     return this.adminService.updateUserById(id, user);
