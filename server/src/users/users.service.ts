@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ProjectionType, RootFilterQuery } from 'mongoose';
 
 import { objectId, SoftDeleteModel } from 'src/plugins/mongoose';

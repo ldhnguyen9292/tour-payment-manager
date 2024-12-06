@@ -20,6 +20,10 @@ function App() {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
+  console.log(
+    'import.meta.env.VITE_BACKEND_URL',
+    import.meta.env.VITE_BACKEND_URL
+  );
 
   useEffect(() => {
     const checkAuthStatus = async () => {

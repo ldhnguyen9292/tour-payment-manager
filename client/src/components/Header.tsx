@@ -31,7 +31,7 @@ const Header: React.FC = () => {
                 alt={user?.name || user?.username || 'User'}
               />
               <AvatarFallback>
-                {user?.name?.charAt(0) || user?.username.charAt(0) || 'U'}
+                {user?.name?.charAt(0) || user?.username?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>

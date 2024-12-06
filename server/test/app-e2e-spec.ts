@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import * as passport from 'passport';
 import * as request from 'supertest';
 
+import { AdminModule } from 'src/admin/admin.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { generatePassword } from 'src/lib/randomPass';
 import { User } from 'src/users/user.schema';
@@ -40,6 +41,7 @@ describe('AppController', () => {
         }),
         AuthModule,
         UsersModule,
+        AdminModule,
       ],
     }).compile();
 
@@ -68,12 +70,7 @@ describe('AppController', () => {
     agent = request.agent(app.getHttpServer());
   });
 
-  afterAll(async () => {
-    await app.close();
-    await mongoServer.stop();
-  });
-
-  beforeEach(async () => {
+  beforeAll(async () => {
     await userModel.deleteMany({});
     await userModel.create({
       username: 'admin',
@@ -81,6 +78,11 @@ describe('AppController', () => {
       email: 'admin@admin.com',
       isAdmin: true,
     });
+  });
+
+  afterAll(async () => {
+    await app.close();
+    await mongoServer.stop();
   });
 
   describe('AuthController', () => {
@@ -121,6 +123,33 @@ describe('AppController', () => {
     it('should log in by Facebook OAuth', async () => {
       const response = await agent.get('/auth/facebook').expect(302);
       expect(response.header.location).toContain('facebook.com');
+    });
+  });
+
+  describe('AdminController', () => {
+    beforeAll(async () => {
+      await agent.post('/auth/login').send({ username: 'admin', password });
+    });
+
+    afterAll(async () => {
+      await agent.post('/auth/logout');
+    });
+
+    it('should return all users', async () => {
+      await agent.get('/admin/users').expect(200);
+    });
+
+    it('should return a user by id', async () => {
+      const user = await userModel.findOne({ username: 'admin' });
+      await agent.get(`/admin/users/${user._id}`).expect(200);
+    });
+
+    it('should not delete admin user', async () => {
+      const user = await userModel.findOne({ username: 'admin' });
+      await agent.delete(`/admin/users/${user._id}`).expect(400);
+
+      // logout after deleting user
+      await agent.post('/auth/logout').expect(200);
     });
   });
 
@@ -167,28 +196,6 @@ describe('AppController', () => {
           password: generatePassword(),
         })
         .expect(400);
-    });
-
-    it('should return all users', async () => {
-      await agent
-        .post('/auth/login')
-        .send({ username: 'admin', password })
-        .expect(200);
-
-      await agent.get('/users').expect(200);
-    });
-
-    it('should return a user by id', async () => {
-      const user = await userModel.findOne({ username: 'admin' });
-      await agent.get(`/users/${user._id}`).expect(200);
-    });
-
-    it('should not delete admin user', async () => {
-      const user = await userModel.findOne({ username: 'admin' });
-      await agent.delete(`/users/${user._id}`).expect(400);
-
-      // logout after deleting user
-      await agent.post('/auth/logout').expect(200);
     });
   });
 });
