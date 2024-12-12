@@ -8,7 +8,10 @@ export class AdminService {
   constructor(private usersService: UsersService) {}
 
   async findAllUsers(isDeleted = false) {
-    return this.usersService.find({ isDeleted });
+    const condition = isDeleted
+      ? { deleted: true }
+      : { deleted: { $not: { $gt: true } } };
+    return this.usersService.find(condition);
   }
 
   async findUserById(id: string) {
@@ -23,7 +26,7 @@ export class AdminService {
     return this.usersService.updateById(id, user);
   }
 
-  async deleteUserById(id: string) {
+  async softDeleteById(id: string) {
     return this.usersService.softDelete(id);
   }
 

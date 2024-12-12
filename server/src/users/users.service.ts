@@ -4,13 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { ProjectionType, RootFilterQuery } from 'mongoose';
 
-import { objectId, SoftDeleteModel } from 'src/plugins/mongoose';
-import { User } from './user.schema';
+import { objectId } from 'src/lib/mongoose';
+import { User, UserModel } from './user.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private userModel: SoftDeleteModel<User>,
+    @InjectModel('User') private userModel: typeof UserModel,
     private configService: ConfigService,
   ) {}
 
@@ -30,7 +30,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.userModel.findOne({ email }).exec();
+    return this.userModel.findOne({ email, isDeleted: false }).exec();
   }
 
   async create(user: User): Promise<User> {
@@ -80,7 +80,9 @@ export class UsersService {
       const existedEmail = await this.userModel.findOne({ email: user.email });
 
       if (existedEmail) {
-        throw new BadRequestException('Email already exists');
+        throw new BadRequestException(
+          'Email already exists! Please contact Admin to change your email!',
+        );
       }
     }
 
@@ -104,22 +106,22 @@ export class UsersService {
       .exec();
   }
 
-  async softDelete(id: string): Promise<User | null> {
+  async softDelete(id: string): Promise<void> {
     // Cannot delete admin user
     const user = await this.userModel.findById(objectId(id)).exec();
     if (user.isAdmin) {
       throw new BadRequestException('Cannot delete admin user');
     }
 
-    return this.userModel.softDelete(id);
+    await this.userModel.softDelete(id);
   }
 
-  async restore(id: string): Promise<User | null> {
-    return this.userModel.restore(id);
+  async restore(id: string): Promise<void> {
+    await this.userModel.restore(id);
   }
 
   async sendEmailToResetPassword(email: string): Promise<void> {
-    const existedUser = await this.userModel.findOne({ email }).exec();
+    const existedUser = await this.findByEmail(email);
 
     if (!existedUser) {
       throw new BadRequestException('User not found!');
@@ -138,9 +140,9 @@ export class UsersService {
     token: string;
     password: string;
   }): Promise<User | null> {
-    const existedUser = await this.userModel
-      .findOne({ resetPasswordToken: data.token })
-      .exec();
+    const existedUser = await this.findOne({
+      resetPasswordToken: data.token,
+    });
 
     if (!existedUser) {
       throw new BadRequestException('User not found!');

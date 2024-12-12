@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { objectId, SoftDeleteModel } from 'src/plugins/mongoose';
-import { User } from './user.schema';
+import { objectId } from 'src/lib/mongoose';
+import { UserModel } from './user.schema';
 
 @Injectable()
 export class TeamMembersService {
-  constructor(@InjectModel('User') private userModel: SoftDeleteModel<User>) {}
+  constructor(@InjectModel('User') private userModel: typeof UserModel) {}
 
   async findAll(id: string) {
     return this.userModel

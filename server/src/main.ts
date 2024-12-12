@@ -86,7 +86,7 @@ bootstrap();
  *    + PUT /admin/users/:id
  *    + DELETE /admin/users/:id
  *    + PUT /admin/restore/users/:id
- *  - Tour APIs:
+ *  - Tour APIs: Done
  *    + GET /tours
  *    + GET /tours/:id
  *    + POST /tours

@@ -25,11 +25,11 @@ import { AdminService } from './admin.service';
 
 @Controller('admin')
 @UseGuards(AuthenticatedGuard)
-@RequireAdmin()
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
   @Get('users')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Get all users',
     description: 'Only available to admin users',
@@ -52,6 +52,7 @@ export class AdminController {
   }
 
   @Get('users/:id')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Get a user by id',
     description: 'Only available to admin users',
@@ -63,6 +64,7 @@ export class AdminController {
   }
 
   @Post('users')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Create a new user',
     description: 'Only available to admin users',
@@ -76,6 +78,7 @@ export class AdminController {
   }
 
   @Put('users/:id')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Update a user by id',
     description: 'Only available to admin users',
@@ -97,23 +100,25 @@ export class AdminController {
   }
 
   @Delete('users/:id')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Delete a user by id',
     description: 'Only available to admin users',
   })
   @ApiParam({ name: 'id' })
   @ApiResponse({ status: 200 })
-  async remove(@Param('id') id: string) {
-    return this.adminService.deleteUserById(id);
+  async delete(@Param('id') id: string) {
+    return this.adminService.softDeleteById(id);
   }
 
   @Put('restore/users/:id')
+  @RequireAdmin()
   @ApiOperation({
     summary: 'Restore a user by id',
     description: 'Only available to admin users',
   })
   @ApiParam({ name: 'id' })
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 200 })
   async restore(@Param('id') id: string) {
     return this.adminService.restoreUserById(id);
   }

@@ -25,7 +25,7 @@ import { User } from './user.schema';
 import { UsersService } from './users.service';
 
 @Controller('users')
-@ApiTags('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
@@ -73,11 +73,6 @@ export class UsersController {
   async updateUserInfo(@Param() id: string, @Body() user: User) {
     return this.usersService.updateById(id, user);
   }
-
-  /**
-   *    + PUT /users/team-members/:id
-   *    + DELETE /users/team-members/:id
-   */
 
   @Get('reset-password/:email')
   @ApiOperation({

@@ -1,14 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document, model, Schema as MongooseSchema } from 'mongoose';
+import { MongoosePluginModel, SoftDeletePlugin } from 'src/lib/mongoose';
 
-import { addSoftDelete } from 'src/plugins/mongoose';
+import { Tour } from 'src/tours/tour.schema';
 
 @Schema({ collection: 'users', timestamps: true })
 @ApiSchema({
   name: 'User',
 })
-export class User extends Document {
+class User extends Document {
   @Prop({ required: true, unique: true })
   @ApiProperty({
     type: 'string',
@@ -70,7 +71,17 @@ export class User extends Document {
 
   @Prop()
   resetPasswordToken?: string;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Tour' }],
+    default: [],
+  })
+  tours?: Tour[];
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.plugin(addSoftDelete); // Apply the plugin
+const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.plugin(SoftDeletePlugin);
+
+const UserModel = model<User>('User', UserSchema) as MongoosePluginModel<User>;
+
+export { User, UserModel, UserSchema };

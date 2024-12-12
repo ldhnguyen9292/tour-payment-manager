@@ -11,7 +11,7 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<User> {
     // search username or email
     const user = await this.usersService.findOne(
-      { $or: [{ username }, { email: username }] },
+      { $or: [{ username }, { email: username }], isDeleted: false },
       {
         password: 1,
         username: 1,
