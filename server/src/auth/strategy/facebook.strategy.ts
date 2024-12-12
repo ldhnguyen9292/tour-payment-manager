@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
+
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private usersService: UsersService) {
     super({
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,

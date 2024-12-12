@@ -6,7 +6,7 @@ import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private usersService: UsersService) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,

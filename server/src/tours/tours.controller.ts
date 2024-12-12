@@ -63,7 +63,7 @@ export class ToursController {
   @ApiResponse({ status: 201, type: Tour })
   async create(@Req() req, @Body() tour: Tour): Promise<Tour> {
     const user = req.user as User;
-    tour.user = user;
+    tour.createdBy = user;
     return this.toursService.create(tour);
   }
 

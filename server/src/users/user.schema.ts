@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Document, model, Schema as MongooseSchema } from 'mongoose';
-import { MongoosePluginModel, SoftDeletePlugin } from 'src/lib/mongoose';
 
+import { MongoosePluginModel, SoftDeletePlugin } from 'src/lib/mongoose';
 import { Tour } from 'src/tours/tour.schema';
 
 @Schema({ collection: 'users', timestamps: true })
