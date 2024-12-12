@@ -25,7 +25,7 @@ export default defineConfig(() => {
       port: 3000
     },
     define: {
-      VITE_BACKEND_URL: env.VITE_BACKEND_URL
+      VITE_BACKEND_URL: JSON.stringify(env.VITE_BACKEND_URL)
     }
   };
 });

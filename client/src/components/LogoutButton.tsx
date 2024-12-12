@@ -6,10 +6,6 @@ import { Button } from '@/components/ui/button';
 import { logout } from '@/store/auth/authSlice';
 
 const LogoutButton: React.FC = () => {
-  console.log(
-    'import.meta.env.VITE_BACKEND_URL',
-    import.meta.env.VITE_BACKEND_URL
-  );
   const dispatch = useDispatch();
 
   const handleLogout = async () => {

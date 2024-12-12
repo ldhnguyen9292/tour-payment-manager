@@ -71,13 +71,16 @@ describe('AppController', () => {
   });
 
   beforeAll(async () => {
-    await userModel.deleteMany({});
-    await userModel.create({
-      username: 'admin',
-      password: await bcrypt.hash(password, 10),
-      email: 'admin@admin.com',
-      isAdmin: true,
-    });
+    const exitedAdmin = await userModel.findOne({ username: 'admintest' });
+
+    if (!exitedAdmin) {
+      await userModel.create({
+        username: 'admintest',
+        password: await bcrypt.hash(password, 10),
+        email: 'admin@test.com',
+        isAdmin: true,
+      });
+    }
   });
 
   afterAll(async () => {
